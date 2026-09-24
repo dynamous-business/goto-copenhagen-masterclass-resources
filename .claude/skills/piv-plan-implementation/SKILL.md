@@ -30,6 +30,8 @@ Transform a feature request into a **comprehensive implementation plan** through
 
 **Inherit, don't re-decide**: This is a **per-ticket** plan. If the ticket belongs to an epic that already has architecture decisions — a **linked architecture page** (e.g. a Confluence page from the `plan-architecture` skill, reached from the ticket's epic), an `## Architecture` / `## Engineering` section on the epic, or a local `architecture.md` / `engineering-plan.md` — **read it first** and treat its cross-cutting calls (stack & versions, data model, security boundaries, the seams new code plugs into) as **already decided**. Inherit them; don't reopen them. Plan only what's left at the ticket level: the specific files, the local patterns to mirror, the tests. If a ticket genuinely needs to break an epic-level decision, flag it in Open Questions rather than silently diverging.
 
+**Direction check**: if the repository has a `direction.md` (`.claude/references/direction.md` first, then the repo root), read it before settling scope. It states what the project is and is not. If the request conflicts with a clause, stop and say so, citing the clause (for example `direction.md §not-multi-tenant`), instead of planning around it; a human decides whether the direction changes. If it does not exist, continue.
+
 ## Planning Process
 
 ### Phase 1: Feature Understanding
@@ -509,3 +511,9 @@ After creating the Plan, provide:
 - Complexity assessment
 - Key implementation risks or considerations
 - Estimated confidence score for one-pass success
+
+## Running under an orchestrator
+
+Do not narrate routine progress. No one is watching this run live. Put useful detail in the artifact, the report, and the final handoff.
+
+If the launch instructions name an artifact directory, write your plan, report, or review there instead of the default path, and return its absolute path.

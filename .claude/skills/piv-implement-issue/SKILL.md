@@ -34,6 +34,10 @@ gh issue view $ARGUMENTS
 - Note all files to modify
 - Review testing requirements
 
+**Steering document:** if the repository has an `engineering.md` (look at `.claude/references/engineering.md`
+first, then the repo root), read it before writing the fix. It states the conventions your change is judged
+against. If it does not exist, continue.
+
 ### 2. Verify Current State — and check for drift
 
 Before making changes:
@@ -136,6 +140,12 @@ If needed:
 - Add notes about the fix
 
 ## Output Report
+
+**Save this report to `docs/issues/fix-report-$ARGUMENTS.md`** — the RCA's sibling — then also present the
+summary in the conversation. The file matters beyond record-keeping: a stage is chainable when its completion
+is a file another process can check, and the report existing is the machine-checkable signal that this fix ran
+to completion. It also gives the outer loop's scan a persistent artifact instead of a report that dies with
+this context window.
 
 ### Fix Implementation Summary
 

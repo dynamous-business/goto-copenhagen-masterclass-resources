@@ -69,5 +69,9 @@ src/
 - Recurring patterns → `.claude/references/<topic>.md` (or a skill). On Claude Code the
   folder is `.claude/`; on another tool, put it wherever that tool looks (e.g. `.agent/`) — it's just markdown.
 - File-type-specific rules → `.claude/rules/<area>.md` (path-scoped; loads only for matching files — keep these project-level)
+- Long-form judgment that shouldn't load on every question → a **steering document**, read by the skill that
+  needs it: `.claude/references/engineering.md` (what code is judged against, read when code is written or
+  reviewed) and `.claude/references/direction.md` (what the project is and is not, read when scope is decided).
+  Templates: `templates/steering/` in the masterclass resources repo.
 
 <!-- Keep it true: run /rules-check-drift before every merge. -->

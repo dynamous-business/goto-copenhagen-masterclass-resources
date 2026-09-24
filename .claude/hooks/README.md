@@ -99,6 +99,53 @@ Common ones worth adding:
 - **protected paths** (`PreToolUse`) — never edit `migrations/`, prod config, or lockfiles.
 - **auto-format** (`PostToolUse`) — format every file the moment it's edited.
 
+## Loading a steering document at session start
+
+A `SessionStart` hook's stdout is added to the conversation as context, so one line makes a steering document
+deterministic instead of relying on a skill to go and read it:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "cat .claude/references/direction.md" } ] }
+    ]
+  }
+}
+```
+
+Two honest notes. The cheaper default is the pointer the pack already ships: the plan, implement, and review
+skills read `engineering.md` and `direction.md` themselves when the file exists, so only the runs that judge
+code or scope pay for it. The hook is the deterministic option: it costs those tokens on every session,
+including a one-line question, in exchange for never depending on the skill remembering. Pick per document.
+Either way the document is just markdown loaded when it is needed.
+
+## Two things to know
+
+- **Hooks run real code, automatically, with your credentials, with no sandbox.** Review a hook the way you'd
+  review a CI script. Only run hooks you have read and trust. This is the same caution as MCP servers.
+- **Coverage is yours.** The hook is guaranteed to *run*; what it *catches* is only as good as the check you
+  wrote. It is the enforcement point, not omniscience.
+
+  Concretely, `pre_tool_use.py` covers three routes to a secret: the **env file**, the **other credential
+  files** (ssh keys, `.pem`, `.aws/credentials`, `.netrc`, `credentials.json`), and the **process environment**
+  (the env-dumping shell builtins, a bare `env`, echoing a `*_KEY` / `*_TOKEN` variable, or code that reads the
+  environment map). That last route matters more than it looks — a guard that blocks the env *file* but not the
+  *environment* is mostly theatre, because the same values are sitting right there in the shell.
+
+  **What it deliberately does not cover: the two-step attack.** Nothing stops the agent *writing* a script that
+  reads the environment and then running it — the run looks innocent, because the secret-handling lives in a
+  file that was just created. Closing that means inspecting the **content** of `Write`/`Edit` calls, not just
+  the command, which is a genuinely different check and roughly triples the size of this file. If you are
+  guarding something that matters, that is the next thing to add.
+
+## Portability
+
+This is not a Claude Code party trick. Codex and Cursor use the same shape (a script, JSON on stdin,
+`exit 2` to block); Gemini CLI does the same job by reading a structured JSON decision instead of the exit
+code; Pi and opencode run hooks in-process as plugins. Learn it once, it transfers — the same way `AGENTS.md`
+became the shared rules file.
+
 ## Two things to know
 
 - **Hooks run real code, automatically, with your credentials, with no sandbox.** Review a hook the way you'd

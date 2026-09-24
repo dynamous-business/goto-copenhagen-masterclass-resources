@@ -14,6 +14,16 @@ docs, ADRs, prior research, a competitor teardown, a Confluence page — **read 
 exploration so you propose options that fit what already exists instead of inventing. If none were passed, **ask
 whether any exist** before you start exploring — a lot of the context you need is usually already written down.
 
+## Before anything else: the direction check
+
+If the repository has a `direction.md` (`.claude/references/direction.md` first, then the repo root), read it
+**before** exploring the codebase or proposing anything. It states what the project is and is not, and its
+aspirational architecture. If the intent, or any approach you are about to propose, conflicts with a clause,
+**open your response by naming the conflict and quoting the clause** (for example `direction.md §single-datastore`),
+then carry on with the conflict flagged on every option it touches, and include at least one option that stays
+inside the direction. The user decides whether the direction changes; the architecture never quietly bends
+around it. If the file does not exist, continue.
+
 ## What this skill is
 
 The intent says **what** to build and **why**. This skill decides **how to approach it** — the eng-lead-level

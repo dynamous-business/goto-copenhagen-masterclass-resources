@@ -244,3 +244,9 @@ gh issue comment $ARGUMENTS --body "<title · the Assessment table (severity/com
 - **Already has a linked PR** → warn; confirm before continuing.
 - **Can't pin the root cause** → set **Confidence: LOW**, document the best hypothesis + what's uncertain, and flag it for a human before any fix.
 - **Scope too large** → suggest splitting into smaller issues; focus this RCA on the core problem and list the rest as out-of-scope.
+
+## Running under an orchestrator
+
+Do not narrate routine progress. No one is watching this run live. Put useful detail in the artifact, the report, and the final handoff.
+
+If the launch instructions name an artifact directory, write your plan, report, or review there instead of the default path, and return its absolute path.

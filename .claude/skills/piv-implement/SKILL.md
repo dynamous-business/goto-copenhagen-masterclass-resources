@@ -33,21 +33,28 @@ won't be in this branch's PR.** If you're still on base, this step creates the b
 - Note the validation commands to run
 - Review the testing strategy
 
+**Steering document:** if the repository has an `engineering.md` (look at `.claude/references/engineering.md`
+first, then the repo root), read it before writing code. It states the conventions your change is judged
+against; the review that follows this implementation reads the same file. If it does not exist, continue.
+
 ### 2. Execute Tasks in Order
 
 For EACH task in "Step by Step Tasks":
 
 #### a. Navigate to the task
+
 - Identify the file and action required
 - Read existing related files if modifying
 
 #### b. Implement the task
+
 - Follow the detailed specifications exactly
 - Maintain consistency with existing code patterns
 - Include proper type hints and documentation
 - Add structured logging where appropriate
 
 #### c. Verify as you go
+
 - After each file change, check syntax
 - Ensure imports are correct
 - Verify types are properly defined
@@ -73,6 +80,7 @@ Execute ALL validation commands from the plan in order:
 ```
 
 If any command fails:
+
 - Fix the issue
 - Re-run the command
 - Continue only when it passes
@@ -90,36 +98,43 @@ Before completing:
 ## Output — write an implementation report
 
 Write a short report to `.claude/reports/<plan-slug>-report.md` (and print the summary). This is what the PR body
-and the `piv-review-pr` gate read — especially the **deviations** (a documented deviation is an *intentional*
+and the `piv-review-pr` gate read — especially the **deviations** (a documented deviation is an _intentional_
 decision the reviewer should not flag):
 
 ```markdown
 # Implementation Report — <feature>
 
-**Plan**: <path>   **Branch**: <feature/...>   **Status**: COMPLETE | PARTIAL
+**Plan**: <path> **Branch**: <feature/...> **Status**: COMPLETE | PARTIAL
 
 ## Summary
+
 {What was built, 2-4 sentences.}
 
 ## Tasks completed
+
 - [task] → `path/to/file` (CREATE/UPDATE)
 
 ## Tests added
+
 {Test files + cases + results.}
 
 ## Validation results
+
 {Type-check / lint / tests / build — pass/fail with counts.}
 
 ## Deviations from the plan
+
 {What changed vs the plan and WHY — or "none". This is the reviewer's signal of intent.}
 
 ## Issues encountered
+
 {Anything notable, or "none".}
 ```
 
 ### Ready for the next step
 - Confirm all changes are complete and validations pass.
 - Next: `piv-commit` the work, then `piv-create-pr` to open the PR (the report fills the PR body), then `piv-review-pr`.
+  Do not review your own implementation in this session: review belongs in a fresh context.
 
 ## Notes
 
@@ -127,3 +142,9 @@ decision the reviewer should not flag):
 - If you need to deviate from the plan, explain why
 - If tests fail, fix implementation until they pass
 - Don't skip validation steps
+
+## Running under an orchestrator
+
+Do not narrate routine progress. No one is watching this run live. Put useful detail in the artifact, the report, and the final handoff.
+
+If the launch instructions name an artifact directory, write your plan, report, or review there instead of the default path, and return its absolute path.

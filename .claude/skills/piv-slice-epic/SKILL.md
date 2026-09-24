@@ -30,6 +30,10 @@ whether they are an `## Architecture` section on the epic or a separate linked p
 model, missing pieces, spikes). If the architecture is a separate page, fetch and read it too. The slicing has to
 respect those calls.
 
+**Direction check:** if the repository has a `direction.md` (`.claude/references/direction.md` first, then the
+repo root), read it before slicing. A story that conflicts with a clause becomes a flagged question citing the
+clause, not a ticket; the rest of the epic is sliced normally.
+
 ### Step 2 — Orient on the code surface (if not already primed)
 
 Slicing needs enough codebase awareness to judge what's independent vs dependent — file overlap, shared seams. If the session is already oriented, skip this. Otherwise **explore it yourself — don't depend on a prior `/prime-codebase`**: starting from the architecture's named seams, data model, and missing pieces, read the relevant files/dirs (e.g. the adapter interface, the orchestrator, the ingestion pipeline) to see what exists, what's reused, and where new code lands. Just enough to slice confidently — not a full re-derivation.

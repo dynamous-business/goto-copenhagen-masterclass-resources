@@ -26,6 +26,11 @@ it in. They don't need to know Python.
 **It's all composition** - a hook is just a small script the harness runs at a defined moment, configured in
 `.claude/settings.json`. You're adding one more deterministic guarantee to the AI Layer.
 
+This skill authors **one** hook. If what the user actually wants is several event-driven stages handing work to
+each other — a baton passed between skills, a gate plus a downstream trigger, a whole event-driven workflow —
+that is `compose-hook-workflow`'s job, not this one; point them there instead of stretching a single hook to
+cover it.
+
 ## The one thing to get right: which event, and can it block?
 
 The behavior the user wants maps to **one** lifecycle event. Pick by *when* it should fire and *whether it must

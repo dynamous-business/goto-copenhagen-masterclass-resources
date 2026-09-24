@@ -29,6 +29,9 @@ State guard: `MERGED`/`CLOSED` → stop ("nothing to review"); `DRAFT` → revie
 ## Phase 2 — Load the context (so you review against the right bar)
 
 - **`CLAUDE.md`** + any `.claude/references/` — the project's standards are the review rubric.
+- **`engineering.md`**, if the repository has one (`.claude/references/engineering.md` first, then the repo root):
+  the steering document that states what code is judged against. Findings that violate one of its rules cite the
+  rule by name. Absent, review against CLAUDE.md and the references alone.
 - **The implementation report** (if `piv-implement` wrote one — `.claude/reports/*{branch}*`) + its plan: read the
   **documented deviations**. A documented deviation is an *intentional decision*, **not** an issue — only flag
   *undocumented* divergences. (No report? Review normally and note its absence.)
@@ -91,3 +94,9 @@ next step is **`piv-fix-review-findings`** on the report, then re-run validation
 - This is the *agentic* gate; it does not replace the human — it gives the human a validated, triaged PR to
   approve. Going deeper means multiple review agents, tuning the reviewer to your stack, and a validation
   pyramid behind it.
+
+## Running under an orchestrator
+
+Do not narrate routine progress. No one is watching this run live. Put useful detail in the artifact, the report, and the final handoff.
+
+If the launch instructions name an artifact directory, write your plan, report, or review there instead of the default path, and return its absolute path.

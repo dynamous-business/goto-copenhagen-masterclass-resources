@@ -179,6 +179,7 @@ that allowed the bug, not just the bug.**
 |---|---|
 | `rules-create-global` | Derives a lean global rules file (CLAUDE.md / AGENTS.md) from your codebase in five steps |
 | `rules-check-drift` | Checks your rules file still matches the code. Run it before a merge |
+| `ai-layer-review` | Reviews a change to the AI Layer itself (rules, skills, hooks, steering docs) the way code gets reviewed |
 | `skills-create` | Builds a new skill, or adapts an existing one to work your way |
 | `hooks-create` | Turns a plain-English guarantee into a working, tested hook |
 | `opportunity-scan` | Scans one run (reactive) or your session logs (proactive) for what to encode next |
@@ -243,6 +244,7 @@ exercise app (pnpm); change their commands for your project.
 | [`automations/`](automations/) | `fix-issue.sh` (headless) and `fix_issue.py` (Agent SDK): the same fix loop written both ways, as templates |
 | [`automations/github-workflows/`](automations/github-workflows/) | Agents in CI: read-only review, hybrid create, Codex deterministic, release notes. Copy into your own `.github/workflows/` |
 | [`.archon/workflows/`](.archon/workflows/) | Archon workflows: the PIV loop, GitHub issue fix, parallel implementation |
+| [`templates/steering/`](templates/steering/) | `engineering.md` and `direction.md`: steering documents the plan, implement and review skills read when present |
 | [`tooling/mcp/codebase_search.py`](tooling/mcp/codebase_search.py) + [`.mcp.json`](.mcp.json) | A codebase-search MCP server (AST-based `where_is`, `find_references`, `outline`). Needs only `uv` |
 
 ### Diagrams (`diagrams/`)
