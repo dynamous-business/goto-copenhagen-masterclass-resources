@@ -23,6 +23,18 @@ Every demo works a **real bug** in this app, filed as a GitHub issue on the exer
 Before any demo, in the exercise repo: `git switch main && git pull`, `cd server && pnpm install && cd ../client && pnpm install`,
 then `gh auth status`. Below, `KIT=../goto-copenhagen-masterclass-resources/demo/feature-flag-app`.
 
+## Before you go on stage (learned in the 9/24 rehearsal)
+
+- **Use a dedicated demo clone and start Claude Code with `claude --dangerously-skip-permissions`** (or
+  `--permission-mode acceptEdits` and approve prompts as they come). Background agents can't show a permission
+  prompt: the orchestrator's PR stage sat waiting on one for 10+ minutes. On a machine with an approval app
+  installed (Kintsugi on the Mac), the prompt goes to that app instead, so it looks like a silent hang.
+- **Run the hook and orchestrator demos in an interactive session**, never `claude -p`. A headless session exits
+  as soon as its turn ends and takes the baton's hand-off and the orchestrator's background stages with it.
+- Rehearsal timings: investigate #3 ~2.5 min, implement #3 3 min, headless #4 4 min (fix, PR, two reviewers),
+  SDK #5 2.5 min, baton #6 1 min after the hand-off, CI review 53 s after `@claude-review`. Start the longer ones at
+  the top of the slide and talk over them.
+
 ## Debugging as a workflow (issue #3)
 
 ```
