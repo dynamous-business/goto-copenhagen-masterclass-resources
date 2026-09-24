@@ -24,6 +24,11 @@ The template this came from: goto-copenhagen-masterclass-resources/automations/f
 
 import subprocess
 import sys
+import warnings
+
+# Read and Bash are allowed outright on purpose; only Edit/Write reach guard().
+# The SDK warns about exactly that on every run, which is noise on stage.
+warnings.filterwarnings("ignore", message="can_use_tool will not be invoked")
 
 from claude_agent_sdk import (
     ClaudeAgentOptions,
