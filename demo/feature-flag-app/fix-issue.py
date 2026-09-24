@@ -30,6 +30,7 @@ from claude_agent_sdk import (
     ClaudeSDKClient,
     PermissionResultAllow,
     PermissionResultDeny,
+    ResultMessage,
     query,
 )
 
@@ -86,6 +87,7 @@ async def main() -> None:
         allowed_tools=["Read", "Bash"],
         can_use_tool=guard,
     )
+    print(f"→ implementing a fix for issue #{ISSUE}")
     async with ClaudeSDKClient(options=options) as implementer:
         await implementer.query(
             f"Study GitHub issue #{ISSUE}. Create a branch fix/issue-{ISSUE}, investigate the fix, "
@@ -108,13 +110,16 @@ async def main() -> None:
 
     # The review: one-shot, nothing carried over — the missing --resume,
     # as a function call. Cheaper model: reading a diff doesn't need the strong brain.
+    print("→ reviewing in a fresh context")
     async for message in query(
         prompt=f"Review the changes for issue #{ISSUE}. "
                "List findings worst-first, BLOCKER or NIT.",
         options=ClaudeAgentOptions(model="sonnet",
                                    allowed_tools=["Read", "Bash"]),
     ):
-        print(message)
+        if isinstance(message, ResultMessage):      # only the final answer, not every event
+            print(message.result)
+            print(f"✓ done — issue #{ISSUE} (review cost ${message.total_cost_usd:.2f})")
 
 
 if __name__ == "__main__":
