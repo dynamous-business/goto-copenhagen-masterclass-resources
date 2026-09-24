@@ -1,0 +1,33 @@
+{
+  "//": "Worked example: merge this hooks block into your project's .claude/settings.json.",
+  "//2": "Scripts go to .claude/hooks/. All three were briefed via hooks-create;",
+  "//3": "these files are the prepared result so recording day has no surprises.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format-touched.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/stop-gate.sh"
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/baton.sh",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}

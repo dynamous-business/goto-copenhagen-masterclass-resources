@@ -1,0 +1,4 @@
+# Hook and automation scripts get copied onto Linux/macOS machines. Without this, a Windows clone with
+# core.autocrlf=true produces CRLF copies that fail with `bad interpreter: /usr/bin/env bash^M`.
+* text=auto eol=lf
+*.png binary

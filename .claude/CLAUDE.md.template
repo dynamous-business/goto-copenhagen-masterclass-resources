@@ -1,0 +1,73 @@
+# CLAUDE.md — <project name>
+
+<!-- ─────────────────────────────────────────────────────────────────────────────
+  STARTER PACK TEMPLATE — copy this to your project root as your rules file and fill it in.
+  Name it CLAUDE.md (Claude Code) or AGENTS.md (the open cross-tool standard) — same content,
+  ~90% identical; this structure works for both. (Both files? Keep the content in AGENTS.md and
+  make CLAUDE.md a single line: @AGENTS.md, so Claude Code auto-loads AGENTS.md.)
+
+  Your rules file is read on EVERY task — the highest-leverage file in your harness, and the
+  easiest to bloat. Four kinds of content earn an always-on slot:
+    (1) a MAP of the codebase,
+    (2) your GROUND RULES — the specific conventions THIS project follows,
+    (3) the COMMANDS the agent should run itself (lint / type-check / test / tooling CLIs), and
+    (4) your WORKING PRINCIPLES — how the agent should operate here (you can't read these off
+        the code; you state them).
+  It's all composition: rules, references, and skills are just markdown loaded when needed —
+  anything not needed every task loads on demand (skills · path-scoped rules · reference guides),
+  and YOU choose where each piece lives.
+
+  Keep it lean — every rule you add is a tax on the ones already there; short enough that the
+  agent still follows it (no magic number — cut anything that wouldn't cause a mistake if removed).
+  Cut-vs-keep test: if the agent would do it anyway without you saying it, CUT it; if it
+  encodes a choice specific to THIS project, KEEP it — and state the choice, not the slogan
+  ("derive types with z.infer", not "type safety is critical").
+
+  Keep it TRUE: run /rules-check-drift before every merge. A rules file that lies to the agent is
+  worse than none. Delete these comments once you've filled it in.
+───────────────────────────────────────────────────────────────────────────── -->
+
+## What this is
+<!-- One paragraph: what the project is, who it's for, the stack in one line. -->
+<one-paragraph project overview + stack>
+
+## Architecture map
+<!-- The highest-leverage section: how the agent navigates without grepping blind.
+     The dirs/files that matter, each with a one-line WHAT + WHY. Fix paths when they move
+     (that's what /rules-check-drift catches); don't enumerate every leaf file. Big repo? Also drop a
+     CLAUDE.md inside each package folder and keep this root map at the package level. -->
+```
+src/
+  <dir>/         # what lives here + why
+  <dir>/<file>   # the one file worth pointing at + why
+```
+
+## Ground rules (conventions)
+<!-- Specific choices THIS project makes — NOT slogans the model already follows. State the choice.
+     Add a rule only after the agent gets it wrong without one (rule of three). -->
+- **Types:** <how you do type safety — e.g. "derive from schemas with z.infer, never hand-write parallel interfaces">
+- **Naming / structure:** <your convention — e.g. "vertical slices under features/; one concern per module">
+- **Errors:** <your philosophy — e.g. "fail fast; never silently swallow; surface actionable errors to the user">
+- **Git workflow:** <branch model · PR rules · how you release>
+- **Testing:** <what "done" means — the command + the bar>
+
+## Working principles (agent steering)
+<!-- How you want the agent to OPERATE here — this can't be derived from the code; you state it.
+     Keep only what actually changes behavior, in YOUR words; drop generic filler the model already follows. -->
+- **Approach:** <e.g. "plan before non-trivial work; surface assumptions + open questions before coding">
+- **When unsure:** <e.g. "ask a clarifying question — don't guess or invent requirements">
+- **Scope:** <e.g. "do exactly what the ticket asks; flag adjacent issues as new tickets, don't fix inline">
+- **Engineering primitives:** <e.g. "fail fast, explicit errors, single responsibility, simplest thing that works">
+- **Verify:** <e.g. "validate against the project's real suite; don't trust self-written tests as the oracle">
+
+## Commands
+<!-- The few you actually run — not an exhaustive CLI dump. -->
+- install: `<...>` · test: `<...>` · type-check: `<...>` · lint: `<...>` · run: `<...>`
+
+## On-demand context
+<!-- Don't inline procedures here — point to where detail loads only when it's needed. -->
+- Recurring patterns → `.claude/references/<topic>.md` (or a skill). On Claude Code the
+  folder is `.claude/`; on another tool, put it wherever that tool looks (e.g. `.agent/`) — it's just markdown.
+- File-type-specific rules → `.claude/rules/<area>.md` (path-scoped; loads only for matching files — keep these project-level)
+
+<!-- Keep it true: run /rules-check-drift before every merge. -->

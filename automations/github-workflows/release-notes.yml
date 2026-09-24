@@ -1,0 +1,123 @@
+# AI-generated release notes. When a version tag (v*) is pushed, Claude reads
+# the commits since the previous tag and writes the release notes, then the
+# workflow publishes a GitHub Release. Also runnable on demand.
+name: Release Notes
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Tag to generate notes for (e.g. v1.2.0)"
+        required: true
+        type: string
+
+jobs:
+  release-notes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write        # create / edit the GitHub Release
+      pull-requests: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # full history — needed to diff against the previous tag
+
+      - name: Resolve tags
+        id: tags
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            CURRENT="${{ inputs.tag_name }}"
+          else
+            CURRENT="${GITHUB_REF#refs/tags/}"
+          fi
+
+          PREVIOUS=$(git tag --sort=-v:refname | grep -A1 "^${CURRENT}$" | tail -1 || true)
+          if [ -z "$PREVIOUS" ] || [ "$PREVIOUS" = "$CURRENT" ]; then
+            PREVIOUS=$(git rev-list --max-parents=0 HEAD | tail -1)
+          fi
+
+          echo "current=$CURRENT"   >> "$GITHUB_OUTPUT"
+          echo "previous=$PREVIOUS" >> "$GITHUB_OUTPUT"
+
+      - name: Gather changes
+        id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CURRENT="${{ steps.tags.outputs.current }}"
+          PREVIOUS="${{ steps.tags.outputs.previous }}"
+
+          git log "${PREVIOUS}..${CURRENT}" --no-merges --pretty=format:"- %s (%h) by %an" > commits.txt
+          git diff "${PREVIOUS}..${CURRENT}" --stat > filestat.txt
+
+          PREV_DATE=$(git log -1 --format=%aI "$PREVIOUS")
+          gh pr list --state merged --limit 100 \
+            --json number,title,author,mergedAt \
+            --jq --arg d "$PREV_DATE" \
+              '.[] | select(.mergedAt >= $d) | "- #\(.number) \(.title) by @\(.author.login)"' \
+            > prs.txt || echo "(none)" > prs.txt
+
+          {
+            echo "# Release Notes Task"
+            echo
+            echo "Version: ${CURRENT}"
+            echo "Previous: ${PREVIOUS}"
+            echo
+            echo "## Commits"
+            echo '```'
+            cat commits.txt
+            echo '```'
+            echo
+            echo "## Merged PRs"
+            echo '```'
+            cat prs.txt
+            echo '```'
+            echo
+            echo "## File changes"
+            echo '```'
+            cat filestat.txt
+            echo '```'
+          } > release-context.md
+
+      - name: Generate release notes with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Read release-context.md. Write polished release notes for this
+            version and save them to release_notes.md.
+
+            Structure:
+            - A 2-3 sentence overview.
+            - "What's New", "Improvements", "Bug Fixes" sections — only include
+              a section if it has content. Group commits by intent, don't just
+              relist them.
+            - A "Contributors" line thanking the unique authors.
+
+            Write for users, not maintainers. Output ONLY the markdown notes
+            into release_notes.md — no preamble.
+          claude_args: |
+            --max-turns 12
+
+      - name: Verify notes were written
+        run: |
+          test -s release_notes.md || { echo "release_notes.md missing or empty"; exit 1; }
+          echo "Preview:"; head -40 release_notes.md
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.tags.outputs.current }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --notes-file release_notes.md
+          else
+            gh release create "$TAG" --title "Release $TAG" --notes-file release_notes.md --latest
+          fi

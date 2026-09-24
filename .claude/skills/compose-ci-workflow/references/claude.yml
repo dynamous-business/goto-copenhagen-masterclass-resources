@@ -1,0 +1,49 @@
+# claude.yml — the interactive-mode workflow (the mode-rule example).
+#
+# A person asks: this workflow has NO `prompt` input, so the action just
+# waits for someone to mention @claude in a comment, review, or issue. That
+# absence is the whole rule — automation mode (claude-review.yml,
+# daily-report.yml) supplies a `prompt`; this one doesn't.
+#
+# ⚠️ COPY-OVER: this file goes to the target project's .github/workflows/ — NEVER into a repo you're only reading (it would let @claude mentions
+# on that repo's own issues/PRs trigger a run).
+# The auth secret comes from /install-github-app (subscription token) —
+# same secret as claude-review.yml, not a second one.
+
+name: Claude Code
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    # Broader than claude-review.yml on purpose: a person invoking this
+    # directly may ask for a commit pushed to a branch, not just a read.
+    # Still no auto-PR-creation — that's the action's own hard rule, not a
+    # permissions grant here.
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read     # lets Claude read CI results on the PR it's replying in
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # No `prompt:` here — that's the mode rule, not an oversight.

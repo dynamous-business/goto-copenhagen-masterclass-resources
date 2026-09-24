@@ -1,0 +1,5 @@
+# Reference example
+
+`fix-issue.sh` is a complete headless workflow that runs a whole bug-fix loop unattended: implement, run the project's real checks, feed any failure back into the **same** session, open the PR from that same session, then review from two **fresh** contexts in parallel and hand both reviews back to the implementer. It is a real working script, not a template — it ran against the AI Tutor as written, and the comments explain why each seam exists rather than what the line does.
+
+Read it for the shape, then change two things for your own project. `CHECKS_DIR` names the directory whose config the checks belong to, and `run_checks()` holds the actual check chain — swap `ruff`/`mypy`/`pytest` for whatever your project's authoritative checks are. Everything else (the `ask()` wrapper, the session id captured from JSON output, the bounded retry loop, the `&`/`wait` parallel reviewers) is the composition, and it is what you should be copying. If you targeted an agent other than Claude Code, `ask()` is the one function that changes.

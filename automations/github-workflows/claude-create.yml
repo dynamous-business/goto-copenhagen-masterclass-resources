@@ -1,0 +1,63 @@
+# Claude hybrid trust pattern — the agent does the implementation,
+# you keep the merge. Comment `@claude` (or `@claude-fix`) on an issue or PR
+# and Claude implements the change and pushes a branch / opens a draft PR.
+# You still review and merge — the agent never owns that last step.
+name: Claude Create
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened]
+
+# Only trusted contributors can invoke the agent. author_association is
+# OWNER / MEMBER / COLLABORATOR for people with write access — forks and
+# drive-by commenters are CONTRIBUTOR or NONE and cannot trigger a run.
+jobs:
+  claude-create:
+    if: |
+      (
+        (github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment')
+        && contains(github.event.comment.body, '@claude')
+        && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+      ) || (
+        github.event_name == 'issues'
+        && contains(github.event.issue.body, '@claude')
+        && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association)
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write        # create branches, push commits
+      pull-requests: write   # open and update PRs
+      issues: write          # comment back on the issue
+      id-token: write        # OIDC auth for the Claude action
+      actions: read          # read CI results for context
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          trigger_phrase: "@claude"
+          track_progress: true
+          prompt: |
+            Implement the change requested in this issue or PR comment.
+
+            Work in this order:
+            1. Read CLAUDE.md and the surrounding code before changing anything.
+            2. Implement the smallest correct change that satisfies the request.
+            3. Run the project's validation (tests, lint, type-check) and fix what fails.
+            4. Commit on a new branch and open a DRAFT pull request.
+
+            Stop at the draft PR. A human reviews and merges — that final step
+            is intentionally not yours.
+          claude_args: |
+            --max-turns 30

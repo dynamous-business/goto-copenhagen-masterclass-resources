@@ -1,0 +1,40 @@
+# claude-review.yml — the automation-mode workflow (the marquee example).
+#
+# An event asks: every opened or updated pull request runs the pack's review
+# skill — the same skill the headless script and the Stop hook called. Fourth invoker,
+# same primitive.
+#
+# ⚠️ COPY-OVER: this file goes to the target project's .github/workflows/ — NEVER into a repo you're only reading (it would run on its pushes).
+# The auth secret comes from /install-github-app (subscription token).
+
+name: Claude Review
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    # Restrict where nobody will look: read-only on content, minimal grants.
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write        # required for the action's GitHub App auth
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0     # the review diffs against the base branch — depth 1 would see nothing
+      - uses: anthropics/claude-code-action@v1
+        with:
+          # The subscription token from setup — tokens bill your plan, not a meter.
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # A skill invocation, not prose. The skill brings its own allowed-tools
+          # frontmatter — it carries its instructions AND its permissions.
+          prompt: "/piv-review-changes Review the changes in this pull request against the base branch (${{ github.base_ref }}). List findings worst-first. Mark each one BLOCKER or NIT."
+          claude_args: |
+            --model sonnet
+            --max-turns 60
+          # Defaults to false, which redacts the review's own summary text
+          # from the run log — the demo reads that summary on camera, so the
+          # claim needs this set explicitly rather than left to the default.
+          show_full_output: true

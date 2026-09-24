@@ -1,0 +1,31 @@
+# daily-report.yml — the cron workflow (shown on camera, not run).
+#
+# Time is the trigger: the scheduler a hook can't be. No checkout — the two
+# granted GitHub MCP tools read commits and issues through the API.
+#
+# ⚠️ COPY-OVER: goes in the target project's .github/workflows/ — never a repo you're only reading.
+# Platform opinions worth knowing: scheduled runs are attributed to whoever
+# last touched the cron line (a bot there needs allowlisting), and public
+# repos disable schedules after 60 days without activity.
+
+name: Daily Report
+on:
+  schedule:
+    - cron: "0 9 * * *"      # 09:00 UTC, every day — nobody asked, time did
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      id-token: write
+    steps:
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # A plain-text prompt has NO tools until granted — so grant exactly two.
+          prompt: "Summarize yesterday's commits and open issues for this repository. Write the summary to the run log."
+          claude_args: |
+            --allowedTools "mcp__github__list_commits,mcp__github__list_issues"
+            --max-turns 10

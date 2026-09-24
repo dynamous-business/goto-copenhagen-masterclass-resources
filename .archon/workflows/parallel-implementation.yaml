@@ -1,0 +1,424 @@
+name: parallel-implementation
+description: |
+  Use when: A feature or plan decomposes into independent slices that can be built
+            concurrently — and you want wall-clock speed without spawning a multi-agent
+            fan-out that fights over the same files.
+  Triggers: "parallel implementation", "build this in parallel", "split this across
+            worktrees", "implement these lanes concurrently".
+  NOT for: A single cohesive change (use piv-loop).
+  NOT for: A GitHub issue (use github-issue-fix).
+  NOT for: Work where the slices touch the same files — that is not parallelizable;
+           sequence it with piv-loop instead.
+
+  This is the worktree-throughput workflow taught in the masterclass. The same total
+  token budget is spent either way — three lanes built in sequence cost the same
+  as three lanes built at once. Parallelism buys wall-clock time, not a discount.
+
+  DAG:
+  1. DECOMPOSE — split the work into up to 3 file-disjoint lanes.
+  2. IMPLEMENT — three lanes run concurrently, each in its own git worktree
+     on its own branch, so they never collide on the working tree.
+  3. INTEGRATE — merge the lane branches back, resolve any conflicts.
+  4. VALIDATE — run full validation on the integrated result.
+  5. REPORT — summarize what each lane built and how integration went.
+
+  Input: a feature description, or a path to an existing `.plan.md`.
+
+provider: claude
+model: sonnet
+
+nodes:
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 1: DECOMPOSE
+  # Split the work into file-disjoint lanes. The disjointness is the
+  # whole game — if two lanes touch the same file, they cannot run
+  # in parallel without a merge conflict, so they must be merged into
+  # one lane here.
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: decompose
+    context: fresh
+    prompt: |
+      # Parallel Implementation — Decompose Into Lanes
+
+      You are splitting a unit of work into independent lanes that can be built
+      concurrently in separate git worktrees.
+
+      **Request**: $ARGUMENTS
+
+      ---
+
+      ## Step 1: Understand the Work
+
+      - If `$ARGUMENTS` is a path to a `.plan.md` file, read it in full.
+      - Otherwise treat it as a feature description.
+      - Read `CLAUDE.md` for project conventions.
+      - Explore the codebase: find the files each part of the work will touch.
+
+      ## Step 2: Split Into File-Disjoint Lanes
+
+      Produce **1 to 3 lanes**. The hard rule: **no file may appear in two lanes.**
+      If two pieces of work touch the same file, they belong in the SAME lane.
+
+      Good split (disjoint): backend route + frontend component + migration.
+      Bad split (collision): "lane 1 edits auth.py" and "lane 2 also edits auth.py".
+
+      If the work genuinely cannot be split without collisions, produce a SINGLE
+      lane containing everything and say so — the workflow still runs, just serially.
+
+      ## Step 3: Write One Lane File Per Lane
+
+      For each lane, write `$ARTIFACTS_DIR/lane-{N}.md` (N = 1, 2, 3):
+
+      ```markdown
+      # Lane {N}: {short title}
+
+      ## Scope
+      {What this lane builds, in 2-3 sentences}
+
+      ## Files (exclusive to this lane)
+      - `{path}` — CREATE / UPDATE — {what changes}
+
+      ## Tasks
+      1. {atomic, verifiable step}
+      2. {atomic, verifiable step}
+
+      ## Validation
+      {command(s) that verify this lane in isolation}
+      ```
+
+      Only create lane files for lanes that exist. If there are 2 lanes, create
+      `lane-1.md` and `lane-2.md` and nothing else.
+
+      ## Step 4: Report
+
+      Output a JSON object describing the split.
+    output_format:
+      type: object
+      properties:
+        lane_count:
+          type: string
+          enum: ["1", "2", "3"]
+        lane_1_title:
+          type: string
+        lane_2_title:
+          type: string
+        lane_3_title:
+          type: string
+        disjoint:
+          type: string
+          enum: ["true", "false"]
+        reasoning:
+          type: string
+      required: [lane_count, disjoint, reasoning]
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 2: IMPLEMENT — three lanes, concurrent, worktree-isolated
+  # These three nodes share no depends_on edge with each other, so
+  # the DAG engine runs them at the same time. Each one creates its
+  # own worktree + branch, so they never touch each other's files.
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: implement-lane-1
+    depends_on: [decompose]
+    context: fresh
+    model: claude-opus-4-6[1m]
+    prompt: |
+      # Parallel Implementation — Lane 1
+
+      Build lane 1 in an isolated git worktree. You run concurrently with the
+      other lanes — stay strictly inside the files this lane owns.
+
+      ---
+
+      ## Step 1: Read the Lane
+
+      Read `$ARTIFACTS_DIR/lane-1.md`. If it does not exist, this lane is unused —
+      output `LANE-1: skipped (no lane file)` and stop.
+
+      ## Step 2: Create an Isolated Worktree
+
+      ```bash
+      LANE_BRANCH="lane/1-$(date +%s)"
+      git worktree add -b "$LANE_BRANCH" "../wt-lane-1" "$BASE_BRANCH"
+      cd ../wt-lane-1
+      echo "$LANE_BRANCH" > "$ARTIFACTS_DIR/.lane-1-branch"
+      ```
+
+      Install dependencies in the worktree if a lockfile is present
+      (`bun install --frozen-lockfile`, `npm ci`, `uv sync`, etc.).
+
+      ## Step 3: Implement
+
+      Work through the lane's tasks in order. Touch ONLY the files listed in the
+      lane file. Follow `CLAUDE.md` conventions. Type-check as you go.
+
+      ## Step 4: Validate
+
+      Run the lane's validation commands. Fix failures before committing
+      (up to 3 attempts). Never commit broken code.
+
+      ## Step 5: Commit & Push the Lane Branch
+
+      ```bash
+      git add -A
+      git commit -m "feat: lane 1 — {short description}"
+      git push -u origin "$LANE_BRANCH"
+      ```
+
+      ## Step 6: Report
+
+      Output `LANE-1: done on {branch}` plus a one-line summary of what changed.
+
+  - id: implement-lane-2
+    depends_on: [decompose]
+    when: "$decompose.output.lane_count != '1'"
+    context: fresh
+    model: claude-opus-4-6[1m]
+    prompt: |
+      # Parallel Implementation — Lane 2
+
+      Build lane 2 in an isolated git worktree. You run concurrently with the
+      other lanes — stay strictly inside the files this lane owns.
+
+      ---
+
+      ## Step 1: Read the Lane
+
+      Read `$ARTIFACTS_DIR/lane-2.md`. If it does not exist, this lane is unused —
+      output `LANE-2: skipped (no lane file)` and stop.
+
+      ## Step 2: Create an Isolated Worktree
+
+      ```bash
+      LANE_BRANCH="lane/2-$(date +%s)"
+      git worktree add -b "$LANE_BRANCH" "../wt-lane-2" "$BASE_BRANCH"
+      cd ../wt-lane-2
+      echo "$LANE_BRANCH" > "$ARTIFACTS_DIR/.lane-2-branch"
+      ```
+
+      Install dependencies in the worktree if a lockfile is present.
+
+      ## Step 3: Implement
+
+      Work through the lane's tasks in order. Touch ONLY the files listed in the
+      lane file. Follow `CLAUDE.md` conventions. Type-check as you go.
+
+      ## Step 4: Validate
+
+      Run the lane's validation commands. Fix failures before committing
+      (up to 3 attempts). Never commit broken code.
+
+      ## Step 5: Commit & Push the Lane Branch
+
+      ```bash
+      git add -A
+      git commit -m "feat: lane 2 — {short description}"
+      git push -u origin "$LANE_BRANCH"
+      ```
+
+      ## Step 6: Report
+
+      Output `LANE-2: done on {branch}` plus a one-line summary of what changed.
+
+  - id: implement-lane-3
+    depends_on: [decompose]
+    when: "$decompose.output.lane_count == '3'"
+    context: fresh
+    model: claude-opus-4-6[1m]
+    prompt: |
+      # Parallel Implementation — Lane 3
+
+      Build lane 3 in an isolated git worktree. You run concurrently with the
+      other lanes — stay strictly inside the files this lane owns.
+
+      ---
+
+      ## Step 1: Read the Lane
+
+      Read `$ARTIFACTS_DIR/lane-3.md`. If it does not exist, this lane is unused —
+      output `LANE-3: skipped (no lane file)` and stop.
+
+      ## Step 2: Create an Isolated Worktree
+
+      ```bash
+      LANE_BRANCH="lane/3-$(date +%s)"
+      git worktree add -b "$LANE_BRANCH" "../wt-lane-3" "$BASE_BRANCH"
+      cd ../wt-lane-3
+      echo "$LANE_BRANCH" > "$ARTIFACTS_DIR/.lane-3-branch"
+      ```
+
+      Install dependencies in the worktree if a lockfile is present.
+
+      ## Step 3: Implement
+
+      Work through the lane's tasks in order. Touch ONLY the files listed in the
+      lane file. Follow `CLAUDE.md` conventions. Type-check as you go.
+
+      ## Step 4: Validate
+
+      Run the lane's validation commands. Fix failures before committing
+      (up to 3 attempts). Never commit broken code.
+
+      ## Step 5: Commit & Push the Lane Branch
+
+      ```bash
+      git add -A
+      git commit -m "feat: lane 3 — {short description}"
+      git push -u origin "$LANE_BRANCH"
+      ```
+
+      ## Step 6: Report
+
+      Output `LANE-3: done on {branch}` plus a one-line summary of what changed.
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 3: INTEGRATE
+  # Merge every lane branch back onto the working branch. Because the
+  # lanes were file-disjoint, conflicts should be rare — but resolve
+  # any that appear and never discard a lane's work.
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: integrate
+    depends_on: [implement-lane-1, implement-lane-2, implement-lane-3]
+    trigger_rule: all_done
+    context: fresh
+    prompt: |
+      # Parallel Implementation — Integrate Lanes
+
+      Every lane that ran has pushed its own branch. Merge them all back.
+
+      **Lane 1 result**: $implement-lane-1.output
+      **Lane 2 result**: $implement-lane-2.output
+      **Lane 3 result**: $implement-lane-3.output
+
+      ---
+
+      ## Step 1: Return to the Main Working Tree
+
+      Make sure you are on the original working branch (`$BASE_BRANCH`'s feature
+      branch), not inside a lane worktree.
+
+      ## Step 2: Collect Lane Branches
+
+      Read whichever of these exist:
+      - `$ARTIFACTS_DIR/.lane-1-branch`
+      - `$ARTIFACTS_DIR/.lane-2-branch`
+      - `$ARTIFACTS_DIR/.lane-3-branch`
+
+      Each file holds one lane branch name. Skip lanes with no branch file.
+
+      ## Step 3: Merge Each Lane Branch In Order
+
+      For each lane branch:
+      ```bash
+      git fetch origin "$LANE_BRANCH"
+      git merge --no-ff "origin/$LANE_BRANCH" -m "merge: integrate $LANE_BRANCH"
+      ```
+
+      If a merge conflicts: the lanes were supposed to be file-disjoint, so a
+      conflict means the decomposition leaked. Resolve it by KEEPING BOTH sides'
+      intent — never drop a lane's changes. Re-run type-check after resolving.
+
+      ## Step 4: Clean Up Worktrees
+
+      ```bash
+      git worktree remove ../wt-lane-1 --force 2>/dev/null || true
+      git worktree remove ../wt-lane-2 --force 2>/dev/null || true
+      git worktree remove ../wt-lane-3 --force 2>/dev/null || true
+      git worktree prune
+      ```
+
+      ## Step 5: Report
+
+      State which branches were merged, whether any conflicts occurred, and
+      how each was resolved.
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 4: VALIDATE
+  # The lanes each validated in isolation. The integrated whole has
+  # never been validated together — do that now.
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: validate
+    depends_on: [integrate]
+    context: fresh
+    prompt: |
+      # Parallel Implementation — Validate the Integrated Result
+
+      All lanes are merged. Validate the combined result — isolated lane
+      validation does not prove the whole works.
+
+      ---
+
+      ## Step 1: Run Full Validation
+
+      ```bash
+      bun run validate 2>&1 || (bun run type-check && bun run lint && bun run test && bun run format:check)
+      ```
+
+      For a Python backend also run `ruff check`, `mypy`, and `pytest` as the
+      project's `CLAUDE.md` specifies.
+
+      ## Step 2: Fix Any Failures
+
+      If the integrated result fails where the isolated lanes passed, the lanes
+      interacted — fix the integration, commit, and re-validate.
+
+      ```bash
+      git add -A && git commit -m "fix: resolve cross-lane integration issues" 2>/dev/null || true
+      ```
+
+      ## Step 3: Report
+
+      Report each check as PASS / FAIL with detail.
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 5: REPORT
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: report
+    depends_on: [validate]
+    model: sonnet
+    context: fresh
+    prompt: |
+      # Parallel Implementation — Final Report
+
+      Summarize the parallel run.
+
+      **Decomposition**: $decompose.output
+      **Integration**: $integrate.output
+      **Validation**: $validate.output
+
+      ---
+
+      ```bash
+      git log --oneline --no-merges $(git merge-base HEAD $BASE_BRANCH)..HEAD
+      git diff --stat $(git merge-base HEAD $BASE_BRANCH)..HEAD
+      ```
+
+      Produce:
+
+      ```
+      ===============================================================
+      PARALLEL IMPLEMENTATION — COMPLETE
+      ===============================================================
+
+      Lanes run:        {count}
+      Branch:           {current branch}
+
+      -- Per Lane ------------------------------------------------------
+      Lane 1: {title} — {one-line outcome}
+      Lane 2: {title} — {one-line outcome}
+      Lane 3: {title} — {one-line outcome}
+
+      -- Integration ---------------------------------------------------
+      {conflicts encountered and how resolved, or "clean merge"}
+
+      -- Validation ----------------------------------------------------
+      {check results}
+
+      -- Files Changed -------------------------------------------------
+      {git diff --stat output}
+      ===============================================================
+      ```

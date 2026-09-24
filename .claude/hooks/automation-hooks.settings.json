@@ -1,0 +1,33 @@
+{
+  "//": "Automation hooks, switched OFF: merge this hooks block into .claude/settings.json to turn them on.",
+  "//2": "The scripts already live in .claude/hooks/. All three were briefed via hooks-create;",
+  "//3": "stop-gate.sh and format-touched.sh are wired for the feature-flag exercise: change their commands for your project.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format-touched.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/stop-gate.sh"
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/baton.sh",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}
