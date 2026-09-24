@@ -12,14 +12,35 @@ This repository is the AI Layer we use all day. It is the same one taught in the
 
 ---
 
+## Setup: paste this into Claude Code
+
+You need a laptop with **Git**, **VS Code** and **[Claude Code](https://code.claude.com)** on a paid plan (Max is
+ideal for a full day). Clone this repo, open Claude Code in it, and paste:
+
+```text
+Set up my machine for the Agentic Engineering masterclass. Check what's already installed first and only
+install what's missing:
+
+1. Node.js 20 or newer
+2. pnpm (npm install -g pnpm)
+3. uv (https://docs.astral.sh/uv/getting-started/installation/)
+4. agent-browser: npm install -g agent-browser, then agent-browser install (add --with-deps on Linux)
+5. Git: make sure user.name and user.email are set. If they aren't, ask me for them.
+
+Then clone https://github.com/dynamous-business/nextjs-feature-flag-exercise next to this repo, run
+pnpm install in its server/ and client/ folders, and tell me the version of each tool.
+```
+
+---
+
 ## The day
 
 | Time | Block | What you do |
 |---|---|---|
-| 09:00-10:30 | **1 · Use** | The system gap. **Exercise 1:** build a ticket with your current process. The whole system in one picture. Install the AI Layer and prime the codebase |
-| 10:45-12:00 | **2 · Build the Layer + Plan** | Derive your global rules in five steps. The epic is a hypothesis. Ground it in the codebase, then slice it into tickets |
-| 13:00-14:30 | **3 · The R-PIV loop** | **Exercise 2:** the *same* ticket, planned, implemented in a fresh session and validated twice. Worktrees while it runs |
-| 14:45-17:00 | **4 · Understand, Evolve, Scale** | Agent = model + harness. **Exercise 3:** build a skill, then a guarantee (a hook). System evolution with an opportunity scan. Debugging as a workflow. Five ways to say "go" |
+| 09:00-10:30 | **1 · The New SDLC** | The system gap. **Exercise 1:** build a ticket with your current process. Install the AI Layer and prime the codebase |
+| 10:45-12:00 | **2 · Setting the Stage** | The PRD, architecture, slicing into tickets, and the R-PIV loop |
+| 13:00-14:30 | **3 · R-PIV, hands on** | **Exercise 2:** the *same* ticket, planned, implemented in a fresh session and validated twice. Worktrees while it runs |
+| 14:45-17:00 | **4 · Foundations, Evolution, Automation** | Rules, skills and hooks (**Exercise 3**). Evolve the system (**Exercise 4**). Debugging as a workflow. Five ways to say "go". AI-native architecture |
 
 Coffee 10:30-10:45 and 14:30-14:45 · Lunch 12:00-13:00
 
@@ -27,22 +48,7 @@ Coffee 10:30-10:45 and 14:30-14:45 · Lunch 12:00-13:00
 
 ## Before you arrive
 
-- A laptop with **Git**, **VS Code** (or your editor), and a **GitHub** account (Git configured with your name
-  and email)
-- **Node.js 20+** and **[pnpm](https://pnpm.io/installation)** (`npm install -g pnpm`) for the exercise app
-- **[Claude Code](https://code.claude.com)**, installed and logged in on a **paid plan**. Claude Max is ideal
-  because we run the agent all day; Pro works but may hit its usage limit in the afternoon. An Anthropic API key
-  works too.
-- Optional: **[uv](https://docs.astral.sh/uv/)** (the hook templates and the codebase-search MCP run with it) and
-  **[agent-browser](https://github.com/vercel-labs/agent-browser)** (`npm install -g agent-browser && agent-browser install`)
-  so the agent can test the UI like a user
-- Clone both repos ahead of time, so the room's wifi doesn't have to:
-
-```bash
-git clone https://github.com/dynamous-business/goto-copenhagen-masterclass-resources
-git clone https://github.com/dynamous-business/nextjs-feature-flag-exercise
-cd nextjs-feature-flag-exercise/server && pnpm install && cd ../client && pnpm install
-```
+Run the setup prompt above, so the room's wifi doesn't have to. That's everything.
 
 ---
 
@@ -85,6 +91,12 @@ Then go back to your two answers from Exercise 1.
 
 On `exercise-3`, follow its `TASK.md`: build (or adapt) a skill with `/skills-create`, then a hook with
 `/hooks-create`, and prove each one works in both directions.
+
+### Exercise 4 · Evolve the system (15 min)
+
+Back on your Exercise 2 branch, in a fresh session, run `/opportunity-scan` on that run: point it at the plan,
+the report, the review and the diff, and tell it what you had to correct. Apply the one change it proposes (a
+rule, a skill step, or a hook). Don't fix the code. Fix the system that allowed it.
 
 ---
 
