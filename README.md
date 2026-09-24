@@ -21,11 +21,13 @@ ideal for a full day). Clone this repo, open Claude Code in it, and paste:
 Set up my machine for the Agentic Engineering masterclass. Check what's already installed first and only
 install what's missing:
 
-1. Node.js 20 or newer
+1. Node.js 20 or newer (Homebrew on macOS, winget on Windows, or nvm/fnm anywhere)
 2. pnpm (npm install -g pnpm)
 3. uv (https://docs.astral.sh/uv/getting-started/installation/)
 4. agent-browser: npm install -g agent-browser, then agent-browser install (add --with-deps on Linux)
 5. Git: make sure user.name and user.email are set. If they aren't, ask me for them.
+
+If any step needs sudo or a graphical installer, don't run it: give me the exact command and I'll run it myself.
 
 Then clone https://github.com/dynamous-business/nextjs-feature-flag-exercise next to this repo, run
 pnpm install in its server/ and client/ folders, and tell me the version of each tool.
@@ -54,7 +56,7 @@ Run the setup prompt above, so the room's wifi doesn't have to. That's everythin
 
 ## The exercises
 
-All three use **[nextjs-feature-flag-exercise](https://github.com/dynamous-business/nextjs-feature-flag-exercise)**,
+All the exercises use **[nextjs-feature-flag-exercise](https://github.com/dynamous-business/nextjs-feature-flag-exercise)**,
 a small React + Express feature flag dashboard. The application code is identical on every branch:
 
 | Branch | What's there | Exercise |
@@ -79,7 +81,9 @@ git add -A && git commit -m "baseline" && git switch exercise-2
 
 ### Exercise 2 · The same ticket, through R-PIV (75 min)
 
-On `exercise-2`, cut your own branch: `git switch -c my-rpiv`
+Stop your Exercise 1 dev servers first (the app always uses ports 3000 and 3001), start a **new** Claude Code
+session so it loads the AI Layer, and cut your own branch: `git switch -c my-rpiv`. When a skill writes into
+`.claude/` (the plan, the report, the review), Claude Code asks first: approve it.
 
 1. **Prime.** New session. `/prime-codebase`, then paste the ticket from `TASK.md`.
 2. **Plan.** `/piv-plan-implementation` with the ticket. Answer its clarifying questions. **Then tighten the
@@ -113,7 +117,7 @@ git add -A && git commit -m "skill + hook" && git switch my-rpiv
 ```
 
 In a fresh session, run `/opportunity-scan` on your R-PIV run: point it at the plan,
-the report, the review and the diff, and tell it what you had to correct. Apply the one change it proposes (a
+the report, the review and the diff, and tell it what you had to correct. Apply its top-ranked change (a
 rule, a skill step, or a hook). Don't fix the code. Fix the system that allowed it.
 
 ---
@@ -276,7 +280,7 @@ exercise app (pnpm); change their commands for your project.
 | [`.archon/workflows/`](.archon/workflows/) | Archon workflows: the PIV loop, GitHub issue fix, parallel implementation |
 | [`demo/feature-flag-app/`](demo/feature-flag-app/) | The afternoon's live demos: `fix-issue.sh` and `fix-issue.py` configured for the exercise app, and the runbook for debugging + five ways to say go |
 | [`templates/steering/`](templates/steering/) | `engineering.md` and `direction.md`: steering documents the plan, implement and review skills read when present |
-| [`tooling/mcp/codebase_search.py`](tooling/mcp/codebase_search.py) + [`.mcp.json`](.mcp.json) | A codebase-search MCP server (AST-based `where_is`, `find_references`, `outline`). Needs only `uv` |
+| [`tooling/mcp/codebase_search.py`](tooling/mcp/codebase_search.py) + [`.mcp.json.example`](.mcp.json.example) | A codebase-search MCP server (AST-based `where_is`, `find_references`, `outline`). Needs only `uv`. Copy the example to `.mcp.json` in your project to switch it on |
 
 ### Diagrams (`diagrams/`)
 
