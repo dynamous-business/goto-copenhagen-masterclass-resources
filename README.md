@@ -63,17 +63,23 @@ a small React + Express feature flag dashboard. The application code is identica
 | `exercise-2` | The same app **with this repo's AI Layer** in `.claude/` | **2 · R-PIV:** the *same* ticket, through the loop |
 | `exercise-3` | The same as `exercise-2`, with a new `TASK.md` | **3 · Build a skill, then a hook** |
 
-Keep each attempt on its own branch (`git switch -c my-baseline`, commit, then `git switch exercise-2`) so you can
-compare them at the end.
+Commit before every switch, so nothing carries from one exercise into the next and you can compare attempts at
+the end. The exact commands are below (and on the slides).
 
 ### Exercise 1 · Baseline (20 min)
 
-`git switch -c my-baseline` from `exercise-1`, then build the ticket in `TASK.md` the way you'd build it today.
+`git switch exercise-1`, then build the ticket in `TASK.md` the way you'd build it today.
 Write down two answers: **how much did you delegate**, and **were you driving, or along for the ride?**
+
+When you're done, commit it and switch to the AI Layer branch:
+
+```bash
+git add -A && git commit -m "baseline" && git switch exercise-2
+```
 
 ### Exercise 2 · The same ticket, through R-PIV (75 min)
 
-On `exercise-2` (`git switch exercise-2 && git switch -c my-rpiv`):
+On `exercise-2`, cut your own branch: `git switch -c my-rpiv`
 
 1. **Prime.** New session. `/prime-codebase`, then paste the ticket from `TASK.md`.
 2. **Plan.** `/piv-plan-implementation` with the ticket. Answer its clarifying questions. **Then tighten the
@@ -89,12 +95,24 @@ Then go back to your two answers from Exercise 1.
 
 ### Exercise 3 · Build a skill, then a guarantee (35 min)
 
-On `exercise-3`, follow its `TASK.md`: build (or adapt) a skill with `/skills-create`, then a hook with
+Commit your R-PIV work first, then switch:
+
+```bash
+git add -A && git commit -m "r-piv" && git switch exercise-3
+```
+
+Follow its `TASK.md`: build (or adapt) a skill with `/skills-create`, then a hook with
 `/hooks-create`, and prove each one works in both directions.
 
 ### Exercise 4 · Evolve the system (15 min)
 
-Back on your Exercise 2 branch, in a fresh session, run `/opportunity-scan` on that run: point it at the plan,
+Commit, then go back to your Exercise 2 branch:
+
+```bash
+git add -A && git commit -m "skill + hook" && git switch my-rpiv
+```
+
+In a fresh session, run `/opportunity-scan` on your R-PIV run: point it at the plan,
 the report, the review and the diff, and tell it what you had to correct. Apply the one change it proposes (a
 rule, a skill step, or a hook). Don't fix the code. Fix the system that allowed it.
 
