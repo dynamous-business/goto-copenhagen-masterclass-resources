@@ -17,7 +17,7 @@ Every demo works a **real bug** in this app, filed as a GitHub issue on the exer
 | #4 | Whitespace-only owner and description are accepted | **1 · Headless** script |
 | #5 | A rollout of 42.5% is accepted | **2 · Agent SDK** program |
 | #6 | Empty and duplicate tags are accepted | **3 · Hooks** (the baton) |
-| #7 | You can create a flag that has already expired | **5 · Orchestrator** |
+| #7 | You can create a flag that has already expired | Spare (a backup issue for any demo) |
 | The PR from #4 | | **4 · CI** review on the pull request |
 
 Before any demo, in the exercise repo: `git switch main && git pull`, `cd server && pnpm install && cd ../client && pnpm install`,
@@ -27,10 +27,10 @@ then `gh auth status`. Below, `KIT=../goto-copenhagen-masterclass-resources/demo
 
 - **Use a dedicated demo clone and start Claude Code with `claude --dangerously-skip-permissions`** (or
   `--permission-mode acceptEdits` and approve prompts as they come). Background agents can't show a permission
-  prompt: the orchestrator's PR stage sat waiting on one for 10+ minutes. On a machine with an approval app
+  prompt: in rehearsal one sat waiting on a prompt for 10+ minutes. On a machine with an approval app
   installed (Kintsugi on the Mac), the prompt goes to that app instead, so it looks like a silent hang.
-- **Run the hook and orchestrator demos in an interactive session**, never `claude -p`. A headless session exits
-  as soon as its turn ends and takes the baton's hand-off and the orchestrator's background stages with it.
+- **Run the hook demo in an interactive session**, never `claude -p`. A headless session exits as soon as its
+  turn ends and takes the baton's hand-off with it.
 - Rehearsal timings: investigate #3 ~2.5 min, implement #3 3 min, headless #4 4 min (fix, PR, two reviewers),
   SDK #5 2.5 min, baton #6 1 min after the hand-off, CI review 53 s after `@claude-review`. Start the longer ones at
   the top of the slide and talk over them.
@@ -76,13 +76,8 @@ Then, in Claude Code: `/piv-investigate-issue 6`. When that session stops, `bato
 Open the PR the headless demo created. The review posted itself when the PR opened. Comment `@claude-review` for another
 pass. Point at: the repo is the trigger, and `contents: read` is the trust boundary.
 
-**5 · Orchestrator**
-```
-/orchestrate-issues 7
-```
-One skill runs investigate, then implement (copy `fix-issue.py` to the repo root first, uncommitted: the skill calls `./fix-issue.py`), then PR, then review, as background agents
-with gates and a cap, and sends one digest. Point at: "an agent saying done is a claim; a green PR is a fact". The
-Archon equivalent is `archon workflow run archon-fix-github-issue` with the same issue.
+**5 · Orchestrator** is on the Five Ways slide as a concept, not demoed live (a full run takes ~12 minutes).
+`/orchestrate-issues <issue>` is there for anyone who wants to try it afterwards.
 
 ## Resetting between rehearsals
 
