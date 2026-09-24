@@ -9,7 +9,7 @@ feature-flag app.
 repo cloned next to it. The scripts stay outside that repo so the fix branches and PRs they create contain only
 the fix.
 
-Every demo works a **real bug** in this app, filed as a GitHub issue on this repo:
+Every demo works a **real bug** in this app, filed as a GitHub issue on the exercise repo:
 
 | Issue | Bug | Demo |
 |---|---|---|
