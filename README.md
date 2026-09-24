@@ -256,6 +256,7 @@ exercise app (pnpm); change their commands for your project.
 | [`automations/`](automations/) | `fix-issue.sh` (headless) and `fix_issue.py` (Agent SDK): the same fix loop written both ways, as templates |
 | [`automations/github-workflows/`](automations/github-workflows/) | Agents in CI: read-only review, hybrid create, Codex deterministic, release notes. Copy into your own `.github/workflows/` |
 | [`.archon/workflows/`](.archon/workflows/) | Archon workflows: the PIV loop, GitHub issue fix, parallel implementation |
+| [`demo/feature-flag-app/`](demo/feature-flag-app/) | The afternoon's live demos: `fix-issue.sh` and `fix-issue.py` configured for the exercise app, and the runbook for debugging + five ways to say go |
 | [`templates/steering/`](templates/steering/) | `engineering.md` and `direction.md`: steering documents the plan, implement and review skills read when present |
 | [`tooling/mcp/codebase_search.py`](tooling/mcp/codebase_search.py) + [`.mcp.json`](.mcp.json) | A codebase-search MCP server (AST-based `where_is`, `find_references`, `outline`). Needs only `uv` |
 
