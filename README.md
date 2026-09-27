@@ -21,7 +21,7 @@ ideal for a full day). Clone this repo, open Claude Code in it, and paste:
 Set up my machine for the Agentic Engineering masterclass. Check what's already installed first and only
 install what's missing:
 
-1. Node.js 20 or newer (Homebrew on macOS, winget on Windows, or nvm/fnm anywhere)
+1. Node.js 22 or newer, upgrading any older version (Homebrew on macOS, winget on Windows, or nvm/fnm anywhere)
 2. pnpm (npm install -g pnpm)
 3. uv (https://docs.astral.sh/uv/getting-started/installation/)
 4. agent-browser: npm install -g agent-browser, then agent-browser install (add --with-deps on Linux)
