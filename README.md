@@ -107,7 +107,6 @@ git add -A && git commit -m "r-piv" && git switch exercise-3
 
 Follow its `TASK.md`: pick something you repeat and turn it into a skill with `/skills-create` (or adapt a
 shipped one), then prove it fires from a plain-language request in a fresh session.
-Fast finishers: add a guarantee with `/hooks-create`.
 
 ### Exercise 4 · Evolve the system (15 min)
 
