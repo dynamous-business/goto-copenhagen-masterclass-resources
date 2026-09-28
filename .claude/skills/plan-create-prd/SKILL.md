@@ -1,6 +1,6 @@
 ---
 name: plan-create-prd
-description: Interactive, problem-first PRD generator — interviews the user to surface the thesis (the problem, and WHY build it) and a falsifiable hypothesis, then writes a focused PRODUCT-level PRD (problem · evidence · hypothesis · users · MVP · success metrics · non-goals · open questions). Use at the start of a greenfield effort to discuss the product. A PRD is INTENT (what/why), never engineering decisions (how) — those are the `plan-architecture` skill's spec.
+description: Interactive, problem-first PRD generator — interviews the user to surface the thesis (the problem, and WHY build it) and a falsifiable hypothesis, then writes a focused PRODUCT-level PRD (problem · evidence · hypothesis · users · MVP · success metrics · non-goals · open questions). Use at the start of a greenfield product, or for a new epic on an existing product (brownfield). A PRD is INTENT (what/why), never engineering decisions (how) — those are the `plan-architecture` skill's spec.
 argument-hint: "[product idea] · [optional: paths to research / reference docs to ground in] (blank = start with questions)"
 ---
 
@@ -12,6 +12,11 @@ argument-hint: "[product idea] · [optional: paths to research / reference docs 
 analytics, a competitor teardown, existing product docs — **read them first** and use them as *evidence*. Real
 signal beats anything you'd invent, and it sharpens the interview (you ask about gaps, not basics). If none were
 passed, **ask whether any exist** before interviewing.
+
+**Existing product (brownfield)?** If the repo already has a product (a PRD in `docs/`, a `CLAUDE.md`, code),
+read those first as **evidence** of what exists today, skimming the code only for what the product does, not how.
+You are writing a **new PRD for the epic** (the change), scoped against the current product. Never rewrite or
+replace the existing PRD unless the user asks; even if they pass it as a reference doc, it's evidence.
 
 ## The one line
 
@@ -129,7 +134,7 @@ sections only, scannable:
 
 ## Notes
 
-- Interview-led; never generate from thin air. Greenfield-first. On an existing product the epic is the input, and you decide its architecture separately with `plan-architecture`.
+- Interview-led; never generate from thin air. Works for **greenfield** (a new product) and **brownfield** (a new epic on an existing product, where the existing PRD and code are evidence, not the thing you rewrite). Either way, the engineering decisions come next with `plan-architecture`.
 - **Solo builder?** Building *for yourself* → you're the user; prove or kill it on yourself fast, you can jump
   closer to a solution. Building *for someone else* → you can't introspect their needs; building it *right*
   beats building it. Either way: thinnest MVP + experiments is how you learn what "right" is.
