@@ -29,8 +29,8 @@ install what's missing:
 
 If any step needs sudo or a graphical installer, don't run it: give me the exact command and I'll run it myself.
 
-Then clone https://github.com/dynamous-business/nextjs-feature-flag-exercise next to this repo, run
-pnpm install in its server/ and client/ folders, and tell me the version of each tool.
+Then clone https://github.com/dynamous-business/nextjs-feature-flag-exercise next to this repo, switch it to
+its exercise-1 branch, run pnpm install in its server/ and client/ folders, and tell me the version of each tool.
 ```
 
 ---
@@ -74,7 +74,13 @@ the end. You don't have to type the git commands: prompt your agent and it runs 
 From the exercise app, start your coding agent and prompt:
 
 ```text
-Switch to the exercise-1 branch, then start the backend and the frontend.
+Switch to the exercise-1 branch.
+```
+
+Then start a **new** session, so none of the AI Layer from `main` is loaded, and prompt:
+
+```text
+Start the backend and the frontend.
 ```
 
 Then build the ticket in `TASK.md` the way you'd build it today.
