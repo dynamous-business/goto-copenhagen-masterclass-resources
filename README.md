@@ -40,9 +40,9 @@ pnpm install in its server/ and client/ folders, and tell me the version of each
 | Time | Block | What you do |
 |---|---|---|
 | 09:00-10:30 | **1 · The New SDLC** | The system gap. **Exercise 1:** build a ticket with your current process. Install the AI Layer and prime the codebase |
-| 10:45-12:00 | **2 · Setting the Stage** | The PRD, architecture, slicing into tickets, and the R-PIV loop |
-| 13:00-14:30 | **3 · R-PIV, hands on** | **Exercise 2:** the *same* ticket, planned, implemented in a fresh session and validated twice. Worktrees while it runs |
-| 14:45-17:00 | **4 · Foundations, Evolution, Automation** | Rules and skills: build one of your own (**Exercise 3**). Debugging as a workflow. Evolve the system (**Exercise 4**). Five ways to say "go". AI-native architecture |
+| 10:45-12:00 | **2 · PRD to tickets, and R-PIV** | The PRD, architecture, slicing into tickets, and the R-PIV loop. Then start **Exercise 2:** the *same* ticket through R-PIV (keep going over lunch if you like) |
+| 13:00-14:30 | **3 · Rules and skills** | Finish Exercise 2 and compare with your baseline. Rules and skills, then build one of your own (**Exercise 3**) |
+| 14:45-17:00 | **4-5 · Evolution, Automation, Architecture** | Debugging as a workflow. Evolve the system (**Exercise 4**). Five ways to say "go". AI-native architecture. Q&A |
 
 Coffee 10:30-10:45 and 14:30-14:45 · Lunch 12:00-13:00
 
@@ -66,30 +66,42 @@ a small React + Express feature flag dashboard. The application code is identica
 | `exercise-3` | The same as `exercise-2`, with a new `TASK.md` | **3 · Build a skill** |
 
 Commit before every switch, so nothing carries from one exercise into the next and you can compare attempts at
-the end. The exact commands are below (and on the slides).
+the end. You don't have to type the git commands: prompt your agent and it runs them. The prompts are below
+(and on the slides).
 
 ### Exercise 1 · Baseline (20 min)
 
-`git switch exercise-1`, then build the ticket in `TASK.md` the way you'd build it today.
-Write down two answers: **how much did you delegate**, and **were you driving, or along for the ride?**
+From the exercise app, start your coding agent and prompt:
 
-When you're done, commit it and switch to the AI Layer branch:
-
-```bash
-git add -A && git commit -m "baseline" && git switch exercise-2
+```text
+Switch to the exercise-1 branch, then start the backend and the frontend.
 ```
 
-### Exercise 2 · The same ticket, through R-PIV (75 min)
+Then build the ticket in `TASK.md` the way you'd build it today.
+Write down two answers: **how much did you delegate**, and **were you driving, or along for the ride?**
 
-Stop your Exercise 1 dev servers first (the app always uses ports 3000 and 3001), start a **new** Claude Code
-session so it loads the AI Layer, and cut your own branch: `git switch -c my-rpiv`. When a skill writes into
-`.claude/` (the plan, the report, the review), Claude Code asks first: approve it.
+When you're done, prompt:
+
+```text
+Commit my baseline, stop the dev servers, and switch to exercise-2.
+```
+
+Then start a **new** session so the AI Layer loads, and run `/prime-codebase`.
+
+### Exercise 2 · The same ticket, through R-PIV (~60 min, started before lunch)
+
+Cut your own branch first. When a skill writes into `.claude/` (the plan, the report, the review), Claude Code
+asks first: approve it.
+
+```text
+Create a new branch called my-rpiv and switch to it.
+```
 
 1. **Prime.** New session. `/prime-codebase`, then paste the ticket from `TASK.md`.
 2. **Plan.** `/piv-plan-implementation` with the ticket. Answer its clarifying questions. **Then tighten the
    validation strategy yourself**: it's the highest-leverage edit you'll make all day. Ask for an end-to-end
    check of the UI with `agent-browser`, not just unit tests.
-3. **Commit the plan** (`git add .claude/plans && git commit -m "plan: flag filtering"`). It's your rollback point.
+3. **Commit the plan** (prompt: "Commit the plan."). It's your rollback point.
 4. **Implement in a FRESH session** that gets only the plan: `/piv-implement .claude/plans/<your-plan>.md`
 5. **Validate twice.** The agent validates its own work as it goes. Then, in *another* fresh session,
    `/piv-review-changes`. The agent doesn't grade its own homework.
@@ -99,21 +111,21 @@ Then go back to your two answers from Exercise 1.
 
 ### Exercise 3 · Build a skill (25 min)
 
-Commit your R-PIV work first, then switch:
+Prompt your agent:
 
-```bash
-git add -A && git commit -m "r-piv" && git switch exercise-3
+```text
+Commit my R-PIV work and switch to the exercise-3 branch.
 ```
 
 Follow its `TASK.md`: pick something you repeat and turn it into a skill with `/skills-create` (or adapt a
 shipped one), then prove it fires from a plain-language request in a fresh session.
 
-### Exercise 4 · Evolve the system (15 min)
+### Exercise 4 · Evolve the system (20 min)
 
-Commit, then go back to your Exercise 2 branch:
+Prompt your agent:
 
-```bash
-git add -A && git commit -m "skill" && git switch my-rpiv
+```text
+Commit my skill and switch back to my-rpiv.
 ```
 
 In a fresh session, run `/opportunity-scan` on your R-PIV run: point it at the plan,
