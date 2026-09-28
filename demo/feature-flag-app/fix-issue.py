@@ -26,6 +26,10 @@ import subprocess
 import sys
 import warnings
 
+# The progress marks below are Unicode; a Windows console on a legacy code page would crash printing them.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 # Read and Bash are allowed outright on purpose; only Edit/Write reach guard().
 # The SDK warns about exactly that on every run, which is noise on stage.
 warnings.filterwarnings("ignore", message="can_use_tool will not be invoked")
@@ -44,7 +48,10 @@ ISSUE = sys.argv[1] if len(sys.argv) > 1 else sys.exit("usage: fix-issue.py <iss
 # where the checks' config lives — change this first
 CHECKS_DIR = "."
 
-CHECKS_CMD = "(cd server && pnpm run build && pnpm run lint && pnpm test) && (cd client && pnpm run build && pnpm run lint)"
+# pnpm --dir instead of `(cd server && ...)`: on Windows, shell=True runs cmd.exe, where parentheses do not
+# isolate a `cd`, so the second `cd client` would fail. This form works in cmd, PowerShell and bash alike.
+CHECKS_CMD = ("pnpm --dir server run build && pnpm --dir server run lint && pnpm --dir server test"
+              " && pnpm --dir client run build && pnpm --dir client run lint")
 
 MAX_FIX_ATTEMPTS = 3         # an unbounded fix loop is money spent on a wall
 

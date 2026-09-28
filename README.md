@@ -42,7 +42,7 @@ pnpm install in its server/ and client/ folders, and tell me the version of each
 | 09:00-10:30 | **1 · The New SDLC** | The system gap. **Exercise 1:** build a ticket with your current process. Install the AI Layer and prime the codebase |
 | 10:45-12:00 | **2 · Setting the Stage** | The PRD, architecture, slicing into tickets, and the R-PIV loop |
 | 13:00-14:30 | **3 · R-PIV, hands on** | **Exercise 2:** the *same* ticket, planned, implemented in a fresh session and validated twice. Worktrees while it runs |
-| 14:45-17:00 | **4 · Foundations, Evolution, Automation** | Rules, skills and hooks (**Exercise 3**). Evolve the system (**Exercise 4**). Debugging as a workflow. Five ways to say "go". AI-native architecture |
+| 14:45-17:00 | **4 · Foundations, Evolution, Automation** | Rules and skills. Debugging as a workflow, then your own debugging skill (**Exercise 3**). Evolve the system (**Exercise 4**). Five ways to say "go". AI-native architecture |
 
 Coffee 10:30-10:45 and 14:30-14:45 · Lunch 12:00-13:00
 
@@ -63,7 +63,7 @@ a small React + Express feature flag dashboard. The application code is identica
 |---|---|---|
 | `exercise-1` | The app and its project docs. **No AI Layer** | **1 · Baseline:** add feature flag filtering (11 acceptance criteria in `TASK.md`) with your current process |
 | `exercise-2` | The same app **with this repo's AI Layer** in `.claude/` | **2 · R-PIV:** the *same* ticket, through the loop |
-| `exercise-3` | The same as `exercise-2`, with a new `TASK.md` | **3 · Build a skill, then a hook** |
+| `exercise-3` | The same as `exercise-2`, with a new `TASK.md` | **3 · Build your own debugging skill** |
 
 Commit before every switch, so nothing carries from one exercise into the next and you can compare attempts at
 the end. The exact commands are below (and on the slides).
@@ -97,7 +97,7 @@ session so it loads the AI Layer, and cut your own branch: `git switch -c my-rpi
 
 Then go back to your two answers from Exercise 1.
 
-### Exercise 3 · Build a skill, then a guarantee (35 min)
+### Exercise 3 · Build your debugging skill (25 min)
 
 Commit your R-PIV work first, then switch:
 
@@ -105,15 +105,16 @@ Commit your R-PIV work first, then switch:
 git add -A && git commit -m "r-piv" && git switch exercise-3
 ```
 
-Follow its `TASK.md`: build (or adapt) a skill with `/skills-create`, then a hook with
-`/hooks-create`, and prove each one works in both directions.
+Follow its `TASK.md`: turn the debugging workflow (reproduce, locate, fix, prevent) into your own skill with
+`/skills-create`, then prove it fires on a real bug in this app and diagnoses before it touches any code.
+Fast finishers: add a guarantee with `/hooks-create`.
 
 ### Exercise 4 · Evolve the system (15 min)
 
 Commit, then go back to your Exercise 2 branch:
 
 ```bash
-git add -A && git commit -m "skill + hook" && git switch my-rpiv
+git add -A && git commit -m "skill" && git switch my-rpiv
 ```
 
 In a fresh session, run `/opportunity-scan` on your R-PIV run: point it at the plan,

@@ -56,10 +56,16 @@ Implement, then the real checks run with **no agent involved**. Failures go back
 opens a PR and two fresh reviewers look at it in parallel. Point at: `run_checks()` is the gate, and `--resume`
 keeps the context.
 
-**2 · Agent SDK** (`fix-issue.py`, the same loop as a program)
+**2 · Agent SDK** (`fix-issue.py`, the same loop as a program; **the one shown at GOTO Copenhagen**)
 ```bash
 $KIT/fix-issue.py 5
 ```
+From PowerShell (no bash needed), in the exercise repo root:
+```powershell
+uv run ..\goto-copenhagen-masterclass-resources\demo\feature-flag-app\fix-issue.py 5
+```
+It branches, fixes, runs the real checks (up to 3 rounds) and prints a fresh-context review. It does **not**
+open a PR, so the CI demo uses an existing PR (e.g. #8) and a live `@claude-review` comment.
 Point at: the session is an object (no session ids), the `.claude/` layer loads by itself, and `guard()` is asked
 about each edit *as it happens*: it refuses any edit to `shared/types.ts` and says why.
 
